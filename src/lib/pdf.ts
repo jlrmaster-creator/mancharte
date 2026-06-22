@@ -4,6 +4,30 @@ import { db } from '../db';
 
 applyPlugin(jsPDF);
 
+function addLogo(doc: jsPDF) {
+  const size = 10;
+  const x = 14;
+  const y = 12;
+  doc.setFillColor(30, 41, 59);
+  doc.rect(x, y, size, size, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.text('M', x + size / 2, y + size / 2 + 3.5, { align: 'center' });
+}
+
+function addHeader(doc: jsPDF, subtitle: string, pageWidth: number) {
+  addLogo(doc);
+  doc.setFontSize(22);
+  doc.text('Mancharte', 28, 20);
+  doc.setFontSize(14);
+  doc.text(subtitle, 28, 28);
+  doc.setFontSize(10);
+  doc.text(`Generado el ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`, 28, 36);
+  doc.setDrawColor(30, 41, 59);
+  doc.setLineWidth(0.5);
+  doc.line(14, 40, pageWidth - 14, 40);
+}
+
 async function downloadPDF(doc: jsPDF, filename: string) {
   const blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
@@ -34,18 +58,9 @@ export async function generateReport() {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  doc.setFontSize(22);
-  doc.text('Mancharte', pageWidth / 2, 20, { align: 'center' });
-  doc.setFontSize(14);
-  doc.text('Reporte de Gestión de Activos Artísticos', pageWidth / 2, 30, { align: 'center' });
-  doc.setFontSize(10);
-  doc.text(`Generado el ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, 38, { align: 'center' });
+  addHeader(doc, 'Reporte de Gestión de Activos Artísticos', pageWidth);
 
-  doc.setDrawColor(30, 41, 59);
-  doc.setLineWidth(0.5);
-  doc.line(14, 42, pageWidth - 14, 42);
-
-  let y = 52;
+  let y = 50;
 
   doc.setFontSize(16);
   doc.text('Resumen General', 14, y);
@@ -143,18 +158,9 @@ export async function generateExhibitionReport(exhibitionId: number) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  doc.setFontSize(22);
-  doc.text('Mancharte', pageWidth / 2, 20, { align: 'center' });
-  doc.setFontSize(14);
-  doc.text(exhibition.name, pageWidth / 2, 30, { align: 'center' });
-  doc.setFontSize(10);
-  doc.text(`Generado el ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, 38, { align: 'center' });
+  addHeader(doc, exhibition.name, pageWidth);
 
-  doc.setDrawColor(30, 41, 59);
-  doc.setLineWidth(0.5);
-  doc.line(14, 42, pageWidth - 14, 42);
-
-  let y = 52;
+  let y = 50;
 
   doc.setFontSize(16);
   doc.text('Detalles de la Exposición', 14, y);
