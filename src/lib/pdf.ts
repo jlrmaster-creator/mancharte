@@ -101,17 +101,10 @@ export async function generateReport() {
   doc.text('Mancharte — Gestión de Activos Artísticos', pageWidth / 2, 290, { align: 'center' });
 
   const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const fileName = `reporte-mancharte-${ts}.pdf`;
 
-  const dataUri = doc.output('datauristring');
-
-  const w = window.open(dataUri);
-  if (!w || w.closed) {
-    const a = document.createElement('a');
-    a.href = dataUri;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  try {
+    location.href = doc.output('datauristring');
+  } catch {
+    doc.save(`reporte-mancharte-${ts}.pdf`);
   }
 }
