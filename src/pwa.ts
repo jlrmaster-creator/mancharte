@@ -38,7 +38,7 @@ export function registerSW() {
 
   window.addEventListener('load', async () => {
     try {
-      const reg = await navigator.serviceWorker.register('/sw.js')
+      const reg = await navigator.serviceWorker.register('sw.js')
       swRegistration = reg
 
       if (reg.active) {
