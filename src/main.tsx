@@ -10,7 +10,7 @@ registerSW()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/mancharte">
       <App />
       <UpdatePrompt />
     </BrowserRouter>
