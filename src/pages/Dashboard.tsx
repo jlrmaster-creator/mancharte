@@ -20,23 +20,23 @@ export function Dashboard() {
   }, []);
 
   return (
-    <div className="relative min-h-0">
+    <div className="relative min-h-[calc(100dvh-6rem)] flex flex-col">
       <svg
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.04]"
+        className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]"
         viewBox="0 0 800 600"
         preserveAspectRatio="xMidYMid slice"
       >
-        <circle cx="100" cy="80" r="120" fill="#4f46e5" />
-        <circle cx="700" cy="150" r="180" fill="#4f46e5" />
-        <rect x="50" y="400" width="200" height="200" rx="20" fill="#4f46e5" transform="rotate(15 150 500)" />
-        <rect x="600" y="420" width="150" height="150" rx="30" fill="#4f46e5" transform="rotate(-20 675 495)" />
-        <path d="M350 50 Q500 200 650 80" stroke="#4f46e5" strokeWidth="4" fill="none" />
-        <path d="M150 250 Q300 400 500 250" stroke="#4f46e5" strokeWidth="3" fill="none" />
-        <circle cx="400" cy="350" r="100" fill="none" stroke="#4f46e5" strokeWidth="2" />
-        <circle cx="400" cy="350" r="60" fill="none" stroke="#4f46e5" strokeWidth="1" />
+        <circle cx="100" cy="80" r="120" fill="#1e293b" />
+        <circle cx="700" cy="150" r="180" fill="#1e293b" />
+        <rect x="50" y="400" width="200" height="200" rx="20" fill="#1e293b" transform="rotate(15 150 500)" />
+        <rect x="600" y="420" width="150" height="150" rx="30" fill="#1e293b" transform="rotate(-20 675 495)" />
+        <path d="M350 50 Q500 200 650 80" stroke="#1e293b" strokeWidth="4" fill="none" />
+        <path d="M150 250 Q300 400 500 250" stroke="#1e293b" strokeWidth="3" fill="none" />
+        <circle cx="400" cy="350" r="100" fill="none" stroke="#1e293b" strokeWidth="2" />
+        <circle cx="400" cy="350" r="60" fill="none" stroke="#1e293b" strokeWidth="1" />
       </svg>
 
-      <div className="relative">
+      <div className="relative flex-1">
         <h1 className="text-xl font-bold text-gray-900 mb-4">Dashboard</h1>
 
         {loading ? (
@@ -108,6 +108,12 @@ export function Dashboard() {
             </Link>
           </div>
         </div>
+      </div>
+
+      <div className="relative mt-8 pt-4 border-t border-gray-200">
+        <p className="text-xs text-gray-400 text-center">
+          Created by José López-Romero Moraleda · v{__APP_VERSION__}
+        </p>
       </div>
     </div>
   );

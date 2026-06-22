@@ -93,6 +93,11 @@ export function ExhibitionForm() {
   };
 
   const onSubmit = async (data: FormData) => {
+    if (selectedArtworkIds.length === 0) {
+      alert('Debes seleccionar al menos una obra para la exposición.');
+      return;
+    }
+
     const payload = {
       name: data.name,
       type: data.type as any,
@@ -194,7 +199,13 @@ export function ExhibitionForm() {
         </Card>
 
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Obras participantes ({selectedArtworkIds.length})</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900">Obras participantes</h2>
+            <span className="text-xs text-gray-400">{selectedArtworkIds.length} seleccionadas</span>
+          </div>
+          {selectedArtworkIds.length === 0 && (
+            <p className="text-xs text-amber-800 mb-2">Selecciona al menos una obra para la exposición.</p>
+          )}
           {artworks.length === 0 ? (
             <p className="text-sm text-gray-500">No hay obras disponibles. Crea obras primero.</p>
           ) : (
@@ -219,7 +230,7 @@ export function ExhibitionForm() {
                   />
                   <div>
                     <p className="text-sm font-medium text-gray-900">{artwork.title}</p>
-                    <p className="text-xs text-gray-500">{artwork.artistName} · {artwork.year}</p>
+                    <p className="text-xs text-gray-500">{artwork.artistName} · {artwork.year} · {artwork.type}</p>
                   </div>
                 </label>
               ))}
