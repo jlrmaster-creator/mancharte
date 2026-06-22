@@ -100,6 +100,29 @@ export async function generateReport() {
   doc.setTextColor(150);
   doc.text('Mancharte — Gestión de Activos Artísticos', pageWidth / 2, 290, { align: 'center' });
 
+  const blob = doc.output('blob');
+  const blobUrl = URL.createObjectURL(blob);
   const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  doc.save(`reporte-mancharte-${ts}.pdf`);
+  const fileName = `reporte-mancharte-${ts}.pdf`;
+
+  if (navigator.share && navigator.canShare) {
+    try {
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Reporte Mancharte' });
+        URL.revokeObjectURL(blobUrl);
+        return;
+      }
+    } catch {
+      // share failed, fall through
+    }
+  }
+
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
 }
