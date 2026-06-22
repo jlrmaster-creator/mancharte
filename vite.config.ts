@@ -9,6 +9,6 @@ export default defineConfig({
     outDir: 'docs',
   },
   define: {
-    __APP_VERSION__: JSON.stringify('1.0.13'),
+    __APP_VERSION__: JSON.stringify('1.0.15'),
   },
 })

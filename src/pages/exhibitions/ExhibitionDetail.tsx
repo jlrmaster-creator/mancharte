@@ -8,6 +8,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { useExhibitionStore } from '../../store/exhibitionStore';
+import { generateExhibitionReport } from '../../lib/pdf';
 
 export function ExhibitionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -127,6 +128,9 @@ export function ExhibitionDetail() {
             <>
               <Button size="sm" variant="ghost" onClick={handleReopen}>
                 🔓 Reabrir exposición
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => generateExhibitionReport(exhibition.id!)}>
+                📄 Descargar PDF
               </Button>
             </>
           )}
