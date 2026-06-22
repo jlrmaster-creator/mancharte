@@ -1,6 +1,8 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import { applyPlugin } from 'jspdf-autotable';
 import { db } from '../db';
+
+applyPlugin(jsPDF);
 
 async function downloadPDF(doc: jsPDF, filename: string) {
   if (typeof navigator.share === 'function') {
