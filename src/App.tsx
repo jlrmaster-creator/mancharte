@@ -26,6 +26,7 @@ function App() {
         <Route path="/exhibitions" element={<ExhibitionList />} />
         <Route path="/exhibitions/new" element={<ExhibitionForm />} />
         <Route path="/exhibitions/:id" element={<ExhibitionDetail />} />
+        <Route path="/exhibitions/:id/edit" element={<ExhibitionForm />} />
         <Route path="/reports" element={<Reports />} />
       </Route>
     </Routes>

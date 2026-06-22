@@ -67,6 +67,11 @@ export function ExhibitionList() {
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${typeColors[exhibition.type] || 'bg-gray-100 text-gray-800'}`}>
                     {exhibition.type}
                   </span>
+                  {exhibition.closed && (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-50 text-red-600">
+                      Cerrada
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-gray-500">
                   {new Date(exhibition.startDate).toLocaleDateString('es-ES')} — {new Date(exhibition.endDate).toLocaleDateString('es-ES')}

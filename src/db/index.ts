@@ -9,10 +9,10 @@ class MancharteDB extends Dexie {
 
   constructor() {
     super('MancharteDB');
-    this.version(1).stores({
+    this.version(2).stores({
       artists: '++id, name, email',
       artworks: '++id, artistId, year, type',
-      exhibitions: '++id, name, type',
+      exhibitions: '++id, name, type, closed',
       exhibitionArtworks: '++id, exhibitionId, artworkId',
     });
   }

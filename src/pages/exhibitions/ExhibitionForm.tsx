@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { db } from '../../db';
-import type { Artwork } from '../../types';
+import type { Artwork, Exhibition } from '../../types';
 import { useExhibitionStore } from '../../store/exhibitionStore';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -29,8 +29,11 @@ const exhibitionTypeOptions = [
 ];
 
 export function ExhibitionForm() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { addExhibition } = useExhibitionStore();
+  const isEdit = Boolean(id);
+  const { addExhibition, updateExhibition } = useExhibitionStore();
+  const [exhibition, setExhibition] = useState<Exhibition | null>(null);
   const [artworks, setArtworks] = useState<(Artwork & { artistName?: string })[]>([]);
   const [selectedArtworkIds, setSelectedArtworkIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +41,7 @@ export function ExhibitionForm() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -57,31 +61,57 @@ export function ExhibitionForm() {
       const artistMap: Record<number, string> = {};
       allArtists.forEach((a) => { if (a.id) artistMap[a.id] = a.name; });
       setArtworks(all.map((aw) => ({ ...aw, artistName: artistMap[aw.artistId] })));
+
+      if (isEdit && id) {
+        const ex = await db.exhibitions.get(Number(id));
+        if (ex) {
+          setExhibition(ex);
+          reset({
+            name: ex.name,
+            type: ex.type,
+            startDate: ex.startDate instanceof Date
+              ? ex.startDate.toISOString().split('T')[0]
+              : String(ex.startDate).split('T')[0],
+            endDate: ex.endDate instanceof Date
+              ? ex.endDate.toISOString().split('T')[0]
+              : String(ex.endDate).split('T')[0],
+            description: ex.description || '',
+          });
+          const links = await db.exhibitionArtworks.where('exhibitionId').equals(ex.id!).toArray();
+          setSelectedArtworkIds(links.map((l) => l.artworkId));
+        }
+      }
+
       setLoading(false);
     })();
-  }, []);
+  }, [id, isEdit, reset]);
 
-  const toggleArtwork = (id: number) => {
+  const toggleArtwork = (artworkId: number) => {
     setSelectedArtworkIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(artworkId) ? prev.filter((x) => x !== artworkId) : [...prev, artworkId]
     );
   };
 
   const onSubmit = async (data: FormData) => {
-    await addExhibition(
-      {
-        name: data.name,
-        type: data.type as any,
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-        description: data.description || undefined,
-      },
-      selectedArtworkIds
-    );
+    const payload = {
+      name: data.name,
+      type: data.type as any,
+      startDate: new Date(data.startDate),
+      endDate: new Date(data.endDate),
+      description: data.description || undefined,
+    };
+
+    if (isEdit && id) {
+      await updateExhibition(Number(id), payload, selectedArtworkIds);
+    } else {
+      await addExhibition(payload, selectedArtworkIds);
+    }
     navigate('/exhibitions');
   };
 
   if (loading) return <Loading />;
+
+  const isClosed = exhibition?.closed;
 
   return (
     <div>
@@ -92,17 +122,50 @@ export function ExhibitionForm() {
         ← Volver
       </button>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Nueva Exposición</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        {isEdit ? 'Editar Exposición' : 'Nueva Exposición'}
+      </h1>
+
+      {isClosed && (
+        <div className="bg-amber-100 text-amber-800 text-sm px-4 py-2 rounded-lg mb-4">
+          Esta exposición está cerrada. No se puede modificar.
+        </div>
+      )}
 
       <div className="space-y-6">
         <Card>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input label="Nombre del evento" placeholder="Ej: Bienal de Venecia" error={errors.name?.message} {...register('name')} />
-            <Select label="Tipo de evento" options={exhibitionTypeOptions} placeholder="Seleccionar tipo" error={errors.type?.message} {...register('type')} />
+            <Input
+              label="Nombre del evento"
+              placeholder="Ej: Bienal de Venecia"
+              error={errors.name?.message}
+              disabled={isClosed}
+              {...register('name')}
+            />
+            <Select
+              label="Tipo de evento"
+              options={exhibitionTypeOptions}
+              placeholder="Seleccionar tipo"
+              error={errors.type?.message}
+              disabled={isClosed}
+              {...register('type')}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input label="Fecha de inicio" type="date" error={errors.startDate?.message} {...register('startDate')} />
-              <Input label="Fecha de fin" type="date" error={errors.endDate?.message} {...register('endDate')} />
+              <Input
+                label="Fecha de inicio"
+                type="date"
+                error={errors.startDate?.message}
+                disabled={isClosed}
+                {...register('startDate')}
+              />
+              <Input
+                label="Fecha de fin"
+                type="date"
+                error={errors.endDate?.message}
+                disabled={isClosed}
+                {...register('endDate')}
+              />
             </div>
 
             <div className="flex flex-col gap-1">
@@ -111,24 +174,27 @@ export function ExhibitionForm() {
                 id="description"
                 rows={3}
                 placeholder="Breve descripción del evento..."
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                disabled={isClosed}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
                 {...register('description')}
               />
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Guardando...' : 'Crear Exposición'}
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => navigate('/exhibitions')}>
-                Cancelar
-              </Button>
-            </div>
+            {!isClosed && (
+              <div className="flex gap-3 pt-2">
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Guardando...' : isEdit ? 'Actualizar Exposición' : 'Crear Exposición'}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => navigate('/exhibitions')}>
+                  Cancelar
+                </Button>
+              </div>
+            )}
           </form>
         </Card>
 
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Obras participantes</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Obras participantes ({selectedArtworkIds.length})</h2>
           {artworks.length === 0 ? (
             <p className="text-sm text-gray-500">No hay obras disponibles. Crea obras primero.</p>
           ) : (
@@ -137,6 +203,8 @@ export function ExhibitionForm() {
                 <label
                   key={artwork.id}
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    isClosed ? 'cursor-not-allowed opacity-60' : ''
+                  } ${
                     selectedArtworkIds.includes(artwork.id!)
                       ? 'border-primary bg-primary-light'
                       : 'border-gray-200 hover:bg-gray-50'
@@ -146,6 +214,7 @@ export function ExhibitionForm() {
                     type="checkbox"
                     checked={selectedArtworkIds.includes(artwork.id!)}
                     onChange={() => toggleArtwork(artwork.id!)}
+                    disabled={isClosed}
                     className="w-4 h-4 text-primary rounded focus:ring-primary"
                   />
                   <div>

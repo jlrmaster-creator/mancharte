@@ -39,7 +39,9 @@ export interface Exhibition {
   startDate: Date;
   endDate: Date;
   description?: string;
+  closed?: boolean;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ExhibitionArtwork {
