@@ -6,6 +6,6 @@ export default defineConfig({
   base: '/mancharte/',
   plugins: [react(), tailwindcss()],
   define: {
-    __APP_VERSION__: JSON.stringify('1.0.3'),
+    __APP_VERSION__: JSON.stringify('1.0.4'),
   },
 })
