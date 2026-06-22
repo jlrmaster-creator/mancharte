@@ -1,0 +1,8 @@
+#!/bin/sh
+# Auto-increment patch version on each push
+# This runs before the push completes
+
+echo "🔖 Auto-bumping patch version..."
+npm version patch --no-git-tag-version
+git add package.json
+git commit -m "chore: bump version to $(node -p "require('./package.json').version")" --no-verify

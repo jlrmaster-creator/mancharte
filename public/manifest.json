@@ -1,0 +1,30 @@
+{
+  "name": "Mancharte",
+  "short_name": "Mancharte",
+  "description": "Gestión de Activos Artísticos",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#4f46e5",
+  "background_color": "#ffffff",
+  "lang": "es",
+  "categories": ["business", "art"],
+  "icons": [
+    {
+      "src": "/mancharte_ico.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/mancharte_ico.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/mancharte_ico.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
