@@ -1,4 +1,4 @@
-const VERSION = '1.0.7';
+const VERSION = '1.0.8';
 
 const SW_PATH = new URL('./', self.location).pathname
 const CACHE = `mancharte-${VERSION}`
