@@ -40,10 +40,13 @@ export function Dashboard() {
       </svg>
 
       <div className="relative flex-1">
-        <div className="mb-4">
-          <h1 className="text-lg font-bold text-gray-900">Bienvenido a Mancharte App</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Gestión de Exposiciones y Activos Artísticos</p>
-          <div className="mt-2 h-px bg-gradient-to-r from-primary/20 via-primary/40 to-transparent" />
+        <div className="mb-4 flex items-start gap-3">
+          <img src="/mancharte_ico.png" alt="Mancharte" className="w-10 h-10 rounded-lg mt-0.5 shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold text-gray-900">Bienvenido a Mancharte App</h1>
+            <p className="text-xs text-gray-500 mt-0.5">Gestión de Exposiciones y Activos Artísticos</p>
+            <div className="mt-2 h-px bg-gradient-to-r from-primary/20 via-primary/40 to-transparent" />
+          </div>
         </div>
 
         {loading ? (

@@ -5,17 +5,6 @@ import { db } from '../db';
 applyPlugin(jsPDF);
 
 async function downloadPDF(doc: jsPDF, filename: string) {
-  if (typeof navigator.share === 'function') {
-    try {
-      const blob = doc.output('blob');
-      const file = new File([blob], filename, { type: 'application/pdf' });
-      await navigator.share({ files: [file], title: 'Mancharte' });
-      return;
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') return;
-    }
-  }
-
   const blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
 
