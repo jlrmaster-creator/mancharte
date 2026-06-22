@@ -1,4 +1,4 @@
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 const CACHE = `mancharte-${VERSION}`;
 
 self.addEventListener('install', (event) => {
