@@ -1,12 +1,11 @@
 type PWAState = {
   needRefresh: boolean
-  offlineReady: boolean
 }
 
 type PWAListener = (state: PWAState) => void
 
 let listeners: PWAListener[] = []
-let state: PWAState = { needRefresh: false, offlineReady: false }
+let state: PWAState = { needRefresh: false }
 let swRegistration: ServiceWorkerRegistration | null = null
 
 function notify() {
@@ -29,7 +28,7 @@ export function updateServiceWorker() {
 }
 
 export function closePrompt() {
-  state = { needRefresh: false, offlineReady: false }
+  state = { needRefresh: false }
   notify()
 }
 
@@ -41,24 +40,14 @@ export function registerSW() {
       const reg = await navigator.serviceWorker.register('sw.js')
       swRegistration = reg
 
-      if (reg.active) {
-        state.offlineReady = true
-        notify()
-      }
-
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing
         if (!newWorker) return
 
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller) {
-              state.needRefresh = true
-              notify()
-            } else {
-              state.offlineReady = true
-              notify()
-            }
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            state.needRefresh = true
+            notify()
           }
         })
       })

@@ -19,7 +19,7 @@ export async function generateReport() {
   doc.setFontSize(10);
   doc.text(`Generado el ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, 38, { align: 'center' });
 
-  doc.setDrawColor(79, 70, 229);
+  doc.setDrawColor(30, 41, 59);
   doc.setLineWidth(0.5);
   doc.line(14, 42, pageWidth - 14, 42);
 
@@ -59,7 +59,7 @@ export async function generateReport() {
       head: [['Año', 'Obras Expuestas']],
       body: yearRows,
       theme: 'striped',
-      headStyles: { fillColor: [79, 70, 229] },
+      headStyles: { fillColor: [30, 41, 59] },
       styles: { fontSize: 10 },
       margin: { left: 14 },
     });
@@ -86,7 +86,7 @@ export async function generateReport() {
       head: [['Tipo de Evento', 'Cantidad']],
       body: typeRows,
       theme: 'striped',
-      headStyles: { fillColor: [79, 70, 229] },
+      headStyles: { fillColor: [30, 41, 59] },
       styles: { fontSize: 10 },
       margin: { left: 14 },
     });
@@ -100,5 +100,6 @@ export async function generateReport() {
   doc.setTextColor(150);
   doc.text('Mancharte — Gestión de Activos Artísticos', pageWidth / 2, 290, { align: 'center' });
 
-  doc.save('reporte-mancharte.pdf');
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  doc.save(`reporte-mancharte-${ts}.pdf`);
 }
