@@ -4,28 +4,53 @@ import { db } from '../db';
 
 applyPlugin(jsPDF);
 
-function addLogo(doc: jsPDF) {
-  const size = 10;
-  const x = 14;
-  const y = 12;
-  doc.setFillColor(30, 41, 59);
-  doc.rect(x, y, size, size, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(10);
-  doc.text('M', x + size / 2, y + size / 2 + 3.5, { align: 'center' });
+let iconDataUrlPromise: Promise<string> | null = null;
+
+async function getIconDataUrl(): Promise<string> {
+  if (!iconDataUrlPromise) {
+    iconDataUrlPromise = new Promise<string>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = reject;
+      img.src = `${import.meta.env.BASE_URL}mancharte_ico.png`;
+    });
+  }
+  return iconDataUrlPromise;
 }
 
-function addHeader(doc: jsPDF, subtitle: string, pageWidth: number) {
-  addLogo(doc);
+async function addLogo(doc: jsPDF) {
+  try {
+    const dataUrl = await getIconDataUrl();
+    doc.addImage(dataUrl, 'PNG', 14, 12, 10, 10);
+  } catch {
+    doc.setFillColor(30, 41, 59);
+    doc.rect(14, 12, 10, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.text('M', 19, 20, { align: 'center' });
+    doc.setTextColor(0, 0, 0);
+  }
+}
+
+async function addHeader(doc: jsPDF, subtitle: string, pageWidth: number) {
+  await addLogo(doc);
+  doc.setTextColor(0, 0, 0);
   doc.setFontSize(22);
-  doc.text('Mancharte', 28, 20);
+  doc.text('Mancharte', pageWidth / 2, 20, { align: 'center' });
   doc.setFontSize(14);
-  doc.text(subtitle, 28, 28);
+  doc.text(subtitle, pageWidth / 2, 30, { align: 'center' });
   doc.setFontSize(10);
-  doc.text(`Generado el ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`, 28, 36);
+  doc.text(`Generado el ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, 38, { align: 'center' });
   doc.setDrawColor(30, 41, 59);
   doc.setLineWidth(0.5);
-  doc.line(14, 40, pageWidth - 14, 40);
+  doc.line(14, 42, pageWidth - 14, 42);
 }
 
 async function downloadPDF(doc: jsPDF, filename: string) {
@@ -60,7 +85,7 @@ export async function generateReport() {
 
   addHeader(doc, 'Reporte de Gestión de Activos Artísticos', pageWidth);
 
-  let y = 50;
+  let y = 52;
 
   doc.setFontSize(16);
   doc.text('Resumen General', 14, y);
@@ -160,7 +185,7 @@ export async function generateExhibitionReport(exhibitionId: number) {
 
   addHeader(doc, exhibition.name, pageWidth);
 
-  let y = 50;
+  let y = 52;
 
   doc.setFontSize(16);
   doc.text('Detalles de la Exposición', 14, y);
