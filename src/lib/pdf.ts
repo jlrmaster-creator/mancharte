@@ -4,44 +4,17 @@ import { db } from '../db';
 
 applyPlugin(jsPDF);
 
-let iconDataUrlPromise: Promise<string> | null = null;
-
-async function getIconDataUrl(): Promise<string> {
-  if (!iconDataUrlPromise) {
-    iconDataUrlPromise = new Promise<string>((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d')!;
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL('image/png'));
-      };
-      img.onerror = reject;
-      img.src = `${import.meta.env.BASE_URL}mancharte_ico.png`;
-    });
-  }
-  return iconDataUrlPromise;
-}
-
-async function addLogo(doc: jsPDF) {
-  try {
-    const dataUrl = await getIconDataUrl();
-    doc.addImage(dataUrl, 'PNG', 14, 12, 10, 10);
-  } catch {
-    doc.setFillColor(30, 41, 59);
-    doc.rect(14, 12, 10, 10, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text('M', 19, 20, { align: 'center' });
-    doc.setTextColor(0, 0, 0);
-  }
-}
-
-async function addHeader(doc: jsPDF, subtitle: string, pageWidth: number) {
-  await addLogo(doc);
+function addLogo(doc: jsPDF) {
+  doc.setFillColor(30, 41, 59);
+  doc.rect(14, 12, 10, 10, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.text('M', 19, 20.5, { align: 'center' });
   doc.setTextColor(0, 0, 0);
+}
+
+function addHeader(doc: jsPDF, subtitle: string, pageWidth: number) {
+  addLogo(doc);
   doc.setFontSize(22);
   doc.text('Mancharte', pageWidth / 2, 20, { align: 'center' });
   doc.setFontSize(14);
