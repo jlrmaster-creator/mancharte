@@ -4,17 +4,7 @@ import { db } from '../db';
 
 applyPlugin(jsPDF);
 
-function addLogo(doc: jsPDF) {
-  doc.setFillColor(30, 41, 59);
-  doc.rect(14, 12, 10, 10, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(11);
-  doc.text('M', 19, 20.5, { align: 'center' });
-  doc.setTextColor(0, 0, 0);
-}
-
 function addHeader(doc: jsPDF, subtitle: string, pageWidth: number) {
-  addLogo(doc);
   doc.setFontSize(22);
   doc.text('Mancharte', pageWidth / 2, 20, { align: 'center' });
   doc.setFontSize(14);
